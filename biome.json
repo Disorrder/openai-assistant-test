@@ -16,9 +16,9 @@
           }
         }
       },
-			"complexity": {
-				"noForEach": "off"
-			}
+      "complexity": {
+        "noForEach": "off"
+      }
     }
   },
   "formatter": {
