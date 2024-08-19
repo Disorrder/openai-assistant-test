@@ -1,0 +1,28 @@
+meta {
+  name: Refresh Token
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{api}}/auth/refresh
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  const cookies = res.headers['set-cookie'];
+  cookies.forEach((cookie) => {
+    const [nameVal] = cookie.split(/;\s/gi);
+    const [name, value] = nameVal.split('=');
+    if (name === "refresh_token") {
+      bru.setEnvVar("refresh_token", value);
+    }
+  });
+  
+  if ("access_token" in res.body) {
+    bru.setEnvVar("access_token", res.body.access_token);  
+  }
+  
+  
+}

@@ -1,0 +1,11 @@
+headers {
+  cookie: refresh-token={{refresh_token}}; Path=/; Max-Age=86400; HttpOnly
+}
+
+auth {
+  mode: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
