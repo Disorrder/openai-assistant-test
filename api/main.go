@@ -3,6 +3,7 @@ package main
 import (
 	"api/assistant"
 	"api/auth"
+	"api/db"
 	"net/http"
 	"os"
 	"strings"
@@ -14,6 +15,8 @@ import (
 
 func main() {
 	godotenv.Load("../.env")
+
+	db.Init()
 
 	router := gin.Default()
 

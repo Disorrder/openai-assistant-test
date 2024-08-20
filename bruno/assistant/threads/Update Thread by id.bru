@@ -1,0 +1,18 @@
+meta {
+  name: Update Thread by id
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{api}}/assistant/threads/thread_TPdIOzZEaJgTMdlZy0Fi1iN0
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "New Title"
+  }
+  
+}

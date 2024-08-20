@@ -1,0 +1,18 @@
+meta {
+  name: Send Message to Thread by id
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{api}}/assistant/threads/thread_TPdIOzZEaJgTMdlZy0Fi1iN0/messages
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "message": "Hello, tell me something about Rain websites"
+  }
+  
+}
