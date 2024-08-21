@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"os"
@@ -42,7 +40,6 @@ func init() {
 
 func InitRoutes(router *gin.RouterGroup) {
 	group := router.Group("/auth")
-	group.GET("/sid", setCookieSidHandler) //?
 	group.POST("/sign-in", signInHandler)
 	// group.POST("/sign-out", signOutHandler)
 	group.POST("/refresh", refreshHandler)
@@ -178,36 +175,4 @@ func generateJWTPair(data TokenData) (string, string, error) {
 	}
 
 	return accessToken, refreshToken, nil
-}
-
-/* SID try */
-
-func setCookieSidHandler(ctx *gin.Context) {
-	// Generate a random SID
-	sid, err := generateRandomString(sidLength)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate SID"})
-		return
-	}
-
-	ctx.SetCookie(
-		sidCookieName,
-		sid,
-		cookieMaxAge,
-		"/",
-		"",
-		false,
-		true,
-	)
-
-	ctx.JSON(http.StatusOK, gin.H{"message": "SID set successfully"})
-}
-
-func generateRandomString(length int) (string, error) {
-	bytes := make([]byte, length)
-	_, err := rand.Read(bytes)
-	if err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(bytes), nil
 }

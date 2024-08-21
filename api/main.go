@@ -4,11 +4,9 @@ import (
 	"api/assistant"
 	"api/auth"
 	"api/db"
+	"api/middlewares"
 	"net/http"
-	"os"
-	"strings"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -19,19 +17,9 @@ func main() {
 	db.Init()
 
 	router := gin.Default()
+	router.Use(middlewares.CORS())
 
-	config := cors.DefaultConfig()
-	config.AllowCredentials = true
-	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
-	// Allow all localhost ports and the specified CLIENT_ORIGIN
-	config.AllowOriginFunc = func(origin string) bool {
-		return strings.HasPrefix(origin, "http://localhost:") ||
-			strings.HasPrefix(origin, "https://localhost:") ||
-			origin == os.Getenv("CLIENT_ORIGIN")
-	}
-	router.Use(cors.New(config))
-
-	api := router.Group("/api")
+	api := router.Group("/v1")
 	api.GET("/hello", helloHandler)
 
 	auth.InitRoutes(api)
