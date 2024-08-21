@@ -4,6 +4,7 @@ import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Input } from "@nextui-org/input";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "~/api/api";
 import { useAuthStore } from "~/store/auth.store";
@@ -11,14 +12,16 @@ import { useAuthStore } from "~/store/auth.store";
 export default function AuthPage() {
   const [username, setUsername] = useState("");
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const router = useRouter();
 
   const loginMutation = useMutation({
     mutationFn: async (username: string) => {
       const response = await api.post("/auth/sign-in", { username });
-      return response.data.accessToken;
+      return response.data.access_token;
     },
     onSuccess: (accessToken) => {
       setAccessToken(accessToken);
+      router.push("/assistant");
     },
   });
 

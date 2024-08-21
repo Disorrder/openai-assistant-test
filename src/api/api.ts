@@ -13,6 +13,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-api.interceptors.response.use((response) => {
-  return response;
+api.interceptors.response.use(null, (error) => {
+  const status = error.response?.status;
+  console.log("🚀 ~ api.interceptors.response.use ~ error:", error);
+
+  if (status === 401) {
+    useAuthStore.getState().logout();
+  }
+
+  return error;
 });
