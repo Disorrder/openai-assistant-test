@@ -1,29 +1,34 @@
-# Create T3 App
+# OpenAI Assistant chat
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-## What's next? How do I make an app with this?
+## Backend
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+Backend is powered by Go and utilising [OpenAI Assistant API](https://platform.openai.com/docs/assistants/introduction)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+### How to run
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+```bash
+cd api
+go run .
+```
 
-## Learn More
+## Frontend
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+Frontend is powered by Next.js and utilising [NextUI](https://nextui.org) for UI components.
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### How to run
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+Using nodejs:
 
-## How do I deploy this?
+```bash
+npm i
+npm run dev
+```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Using Bun:
+
+```bash
+bun i
+bun dev
+```
