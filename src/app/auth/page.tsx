@@ -26,9 +26,13 @@ export default function AuthPage() {
   });
 
   function handleLogin() {
-    // Implement login logic here
-    console.log("Logging in with username:", username);
     loginMutation.mutate(username);
+  }
+
+  function handlePressEnter(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
   }
 
   return (
@@ -43,7 +47,9 @@ export default function AuthPage() {
               label="Username"
               placeholder="Enter your username"
               value={username}
+              autoFocus
               onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={handlePressEnter}
             />
             <Button color="primary" onPress={handleLogin} className="w-full">
               Login

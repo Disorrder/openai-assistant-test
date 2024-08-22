@@ -16,10 +16,8 @@ export default function Sidebar() {
 
   const threadsQuery = useQuery({
     queryKey: ["threads"],
-    queryFn: async () => {
-      const res = await api.get<Thread[]>("/assistant/threads");
-      return res.data;
-    },
+    queryFn: () =>
+      api.get<Thread[]>("/assistant/threads").then((res) => res.data),
   });
   const threads = threadsQuery.data;
   const showThreads = !threadsQuery.isLoading && threadsQuery.data;

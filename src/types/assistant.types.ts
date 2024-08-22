@@ -1,6 +1,7 @@
 export interface Thread {
   id: string;
   title: string;
+  CreatedAt: number;
 }
 
 export interface Message {
