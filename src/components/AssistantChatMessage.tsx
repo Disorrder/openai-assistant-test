@@ -1,4 +1,5 @@
 import { cn } from "@nextui-org/react";
+import ReactMarkdown from "react-markdown";
 import type { Message } from "~/types/assistant.types";
 
 export default function AssistantChatMessage({
@@ -23,7 +24,7 @@ export default function AssistantChatMessage({
           isUser ? "ml-auto bg-blue-600" : "mr-auto min-w-[66%] bg-gray-700",
         )}
       >
-        {textContent?.text.value}
+        <ReactMarkdown>{textContent?.text.value}</ReactMarkdown>
       </div>
       <div className="mt-2 flex-0 self-start text-gray-500 text-xs leading-6">
         {time}

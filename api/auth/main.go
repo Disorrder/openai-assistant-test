@@ -139,12 +139,6 @@ func refreshHandler(ctx *gin.Context) {
 		true,
 	)
 
-	// log tokens
-	fmt.Println("New Access Token:", newAccessToken)
-	fmt.Println("New Refresh Token:", newRefreshToken)
-	fmt.Println("Old Refresh Token:", refreshToken)
-	fmt.Println("username:", username)
-
 	// Return the new access token
 	ctx.JSON(http.StatusOK, gin.H{
 		"access_token": newAccessToken,

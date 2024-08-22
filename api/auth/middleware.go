@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -30,12 +29,10 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, jwt.ErrSignatureInvalid
 			}
-			fmt.Println("Signing method:", jwtSecretKey, string(jwtSecretKey))
 			return jwtSecretKey, nil
 		})
 
 		if err != nil {
-			fmt.Println("Error parsing token:", err, tokenString, token)
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
 			ctx.Abort()
 			return

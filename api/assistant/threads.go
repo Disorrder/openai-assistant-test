@@ -85,8 +85,6 @@ func updateThreadHandler(ctx *gin.Context) {
 	}
 	title := requestBody.Title
 
-	fmt.Println("Title received:", title)
-
 	var thread db.Thread
 
 	db.DB.Where("id = ?", threadID).Where("username = ?", username).First(&thread)
@@ -162,8 +160,6 @@ func sendMessageHandler(ctx *gin.Context) {
 func sendMessage(ctx *gin.Context, threadID string, messageStr string) *openai.Message {
 	username := ctx.GetString("username")
 
-	fmt.Println("Message received:", messageStr, "Thread ID:", threadID)
-
 	if messageStr == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Message is required"})
 		return nil
@@ -177,10 +173,8 @@ func sendMessage(ctx *gin.Context, threadID string, messageStr string) *openai.M
 		return nil
 	}
 
-	fmt.Println("Thread found:", thread)
-
 	// Create a message in the thread
-	message, err := client.CreateMessage(context.Background(), threadID, openai.MessageRequest{
+	_, err := client.CreateMessage(context.Background(), threadID, openai.MessageRequest{
 		Role:    "user",
 		Content: messageStr,
 	})
@@ -189,8 +183,6 @@ func sendMessage(ctx *gin.Context, threadID string, messageStr string) *openai.M
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send message"})
 		return nil
 	}
-
-	fmt.Printf("Message created: %+v\n", fmtJson(message))
 
 	// Run the assistant
 	run, err := client.CreateRun(context.Background(), threadID, openai.RunRequest{
@@ -201,13 +193,6 @@ func sendMessage(ctx *gin.Context, threadID string, messageStr string) *openai.M
 		return nil
 	}
 
-	fmt.Printf("Run created: %+v\n", fmtJson(run))
-
-	// // Set up Server-Sent Events
-	// ctx.Writer.Header().Set("Content-Type", "text/event-stream")
-	// ctx.Writer.Header().Set("Cache-Control", "no-cache")
-	// ctx.Writer.Header().Set("Connection", "keep-alive")
-
 	// Update the run status and stream the response
 	for {
 		runStatus, err := client.RetrieveRun(context.Background(), threadID, run.ID)
@@ -216,8 +201,6 @@ func sendMessage(ctx *gin.Context, threadID string, messageStr string) *openai.M
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve run status"})
 			return nil
 		}
-
-		fmt.Printf("Run status: %+v\n", runStatus.Status)
 
 		if runStatus.Status == "failed" {
 			fmt.Printf("Run failed: %s", runStatus.Status)
@@ -233,8 +216,6 @@ func sendMessage(ctx *gin.Context, threadID string, messageStr string) *openai.M
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve messages"})
 				return nil
 			}
-
-			fmt.Printf("Messages: %+v\n", fmtJson(messages))
 
 			// Send the last message (assistant's response)
 			if len(messages.Messages) == 0 {
