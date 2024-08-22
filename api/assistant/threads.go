@@ -15,12 +15,22 @@ import (
 func InitThreadsRoutes(router *gin.RouterGroup) {
 	threadsGroup := router.Group("/threads")
 
-	threadsGroup.POST("", createThreadHandler)
 	threadsGroup.GET("", getThreadsHandler)
+	threadsGroup.POST("", createThreadHandler)
 	threadsGroup.GET("/:id", getThreadHandler)
 	threadsGroup.PATCH("/:id", updateThreadHandler)
+	threadsGroup.DELETE("/:id", deleteThreadHandler)
 	threadsGroup.GET("/:id/messages", getMessagesHandler)
 	threadsGroup.POST("/:id/messages", sendMessageHandler)
+}
+
+func getThreadsHandler(ctx *gin.Context) {
+	username := ctx.GetString("username")
+
+	var threads []db.Thread
+	db.DB.Where("username = ?", username).Find(&threads)
+
+	ctx.JSON(http.StatusOK, threads)
 }
 
 func createThreadHandler(ctx *gin.Context) {
@@ -45,15 +55,6 @@ func createThreadHandler(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, thread)
-}
-
-func getThreadsHandler(ctx *gin.Context) {
-	username := ctx.GetString("username")
-
-	var threads []db.Thread
-	db.DB.Where("username = ?", username).Find(&threads)
-
-	ctx.JSON(http.StatusOK, threads)
 }
 
 func getThreadHandler(ctx *gin.Context) {
@@ -103,6 +104,23 @@ func updateThreadHandler(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, thread)
+}
+
+func deleteThreadHandler(ctx *gin.Context) {
+	username := ctx.GetString("username")
+	threadID := ctx.Param("id")
+
+	var thread db.Thread
+	db.DB.Where("id = ?", threadID).Where("username = ?", username).First(&thread)
+
+	if thread.ID == "" {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "Thread not found"})
+		return
+	}
+
+	db.DB.Delete(&thread)
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Thread deleted"})
 }
 
 func getMessagesHandler(ctx *gin.Context) {
