@@ -5,11 +5,13 @@ import { IconSend } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "~/api/api";
-import AssistantChatMessage, {
+import AssistantChatMessage from "~/components/AssistantChatMessage";
+import {
+  createMessage,
   defaultThread,
-  getIntroMessage,
-} from "~/components/AssistantChatMessage";
-import { useAssistantStore } from "~/store/assistant.store";
+  introMessageText,
+  useAssistantStore,
+} from "~/store/assistant.store";
 import type {
   CreateMessageDTO,
   Message,
@@ -23,13 +25,7 @@ interface CreateMessageData extends CreateMessageDTO {
 
 export default function AssistantPage() {
   const queryClient = useQueryClient();
-  const {
-    selectedThreadId,
-    setSelectedThreadId,
-    sendingMessages,
-    addSendingMessage,
-    removeSendingMessage,
-  } = useAssistantStore();
+  const { selectedThreadId, setSelectedThreadId } = useAssistantStore();
 
   const threadsQuery = useQuery({
     queryKey: ["threads"],
@@ -75,6 +71,11 @@ export default function AssistantPage() {
     },
   });
 
+  const isSendingMessage =
+    createThreadMutation.isPending ||
+    sendMessageMutation.isPending ||
+    messages?.[0]?.id === "";
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: messagesQuery is not exhaustive
   useEffect(() => {
     messagesQuery.refetch();
@@ -82,7 +83,11 @@ export default function AssistantPage() {
 
   const introMessage = useMemo(() => {
     if (!thread) return;
-    return getIntroMessage(thread);
+    return createMessage({
+      threadId: thread.id,
+      message: introMessageText,
+      role: "assistant",
+    });
   }, [thread]);
 
   const [input, setInput] = useState("");
@@ -90,6 +95,8 @@ export default function AssistantPage() {
   async function handleSendMessage() {
     const formattedInput = input.trim();
     if (!formattedInput) return;
+
+    setInput("");
 
     let threadId = selectedThreadId;
     if (!threadId) {
@@ -104,14 +111,27 @@ export default function AssistantPage() {
       threadId = thread.id;
     }
 
-    sendMessageMutation.mutate(
-      { threadId, input },
-      {
-        onSuccess: () => {
-          setInput("");
-        },
+    const message = createMessage({ threadId, message: formattedInput });
+    queryClient.setQueryData(
+      ["messages", threadId],
+      (oldData?: MessagesListDTO) => {
+        return {
+          ...oldData,
+          data: oldData ? [message, ...oldData.data] : [message],
+        };
       },
     );
+
+    await new Promise<Message>((resolve) => {
+      sendMessageMutation.mutate(
+        { threadId, input },
+        {
+          onSuccess: (message) => {
+            resolve(message);
+          },
+        },
+      );
+    });
   }
 
   function handleCmdEnter(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -149,8 +169,12 @@ export default function AssistantPage() {
             className="flex-1"
             onKeyDown={handleCmdEnter}
           />
-          <Button onClick={handleSendMessage}>
-            <IconSend size={20} />
+          <Button
+            onClick={handleSendMessage}
+            isDisabled={isSendingMessage}
+            isLoading={isSendingMessage}
+          >
+            {!isSendingMessage && <IconSend size={20} />}
           </Button>
         </div>
       </div>

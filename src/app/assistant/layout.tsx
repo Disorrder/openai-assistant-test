@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useStore } from "zustand";
@@ -15,15 +16,17 @@ export default function AssistantLayout({
   const router = useRouter();
   const accessToken = useStore(useAuthStore, (state) => state.accessToken);
   const storeReady = useStoreReady();
+  const queryClient = useQueryClient();
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    console.log("🚀 ~ useEffect ~ accessToken:", accessToken, storeReady);
     if (!storeReady) return;
     if (!accessToken) {
       console.error("Unauthorized, redirecting to login");
+      queryClient.clear();
       router.push("/auth");
     }
-  }, [storeReady, accessToken, router]);
+  }, [storeReady, accessToken]);
 
   if (!accessToken) {
     return null; // Or a loading spinner if you prefer

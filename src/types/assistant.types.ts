@@ -17,7 +17,8 @@ export interface MessageContentText {
   type: "text";
   text: {
     value: string;
-    annotations: any[]; // TODO: Define the type
+    // biome-ignore lint/suspicious/noExplicitAny: TODO: Define the type
+    annotations: any[];
   };
 }
 type MessageContent = MessageContentText;
